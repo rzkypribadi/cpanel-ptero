@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Reseller | ZkyPanel</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Orbitron&display=swap" rel="stylesheet"/>
+</head>
+<body class="dashboard-body">
+  <div class="bg-effects"></div>
+  <div class="grid"></div>
 
+  <div class="dashboard">
+    <aside class="sidebar" data-aos="slide-right" data-aos-delay="100">
+      <div class="logo">⚡ ZkyReseller</div>
+      <div class="role-badge res">Reseller</div>
+
+      <nav class="nav-menu">
+        <a onclick="loadResSection('create-panel')">Buat Panel</a>
+        <a onclick="loadResSection('hapus-data')">Hapus Data Lokal</a>
+        <div class="logout-btn" onclick="logout()">Keluar</div>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="res-content">
+      <div class="welcome" data-aos="fade-up">
+        <h1>Halo, Reseller!</h1>
+        <p>Buat panel pertamamu sekarang.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="api.js"></script>
+</body>
+</html>
