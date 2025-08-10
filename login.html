@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | ZkyPanel</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Orbitron&display=swap" rel="stylesheet"/>
+</head>
+<body class="login-body">
+  <div class="bg-effects"></div>
+  <div class="stars"></div>
 
+  <div class="login-container" data-aos="fade-in">
+    <div class="close-btn" onclick="history.back()">✕</div>
+    <div class="form-card" data-aos="zoom-in" data-aos-delay="200">
+      <div class="form-header">
+        <h2 id="login-title">Masuk sebagai Developer</h2>
+        <div class="underline"></div>
+      </div>
+
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div id="dev-fields">
+          <input type="text" id="username" placeholder="Nama Pengguna" required />
+          <input type="password" id="password" placeholder="Kata Sandi" required />
+        </div>
+
+        <input type="text" id="token" placeholder="Token Akses" style="display:none;" required />
+
+        <button type="submit" class="btn-primary">Masuk</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+  </html>
