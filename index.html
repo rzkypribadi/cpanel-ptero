@@ -3,83 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Create Panel | ZkyDev</title>
+  <title>ZkyPanel | Create Panel</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet"/>
 </head>
-<body>
-  <div class="container" id="main-container">
-    <div class="logo">⚡ <span>ZkyPanel</span></div>
-    <div class="title">Welcome to Panel Creator!</div>
-    <div class="subtitle">Choose your role to continue!.</div>
-    <div class="role-buttons">
-      <button class="btn role-btn developer-btn" onclick="showLogin('developer')">Developer</button>
-      <button class="btn role-btn reseller-btn" onclick="showLogin('reseller')">Reseller</button>
-    </div>
-  </div>
+<body class="index-body">
+  <div class="bg-effects"></div>
+  <div class="stars"></div>
+  <div class="grid"></div>
 
-  <div class="login-container" id="login-container">
-    <div class="form-box">
-      <div class="back-btn" onclick="goBack()">← Back</div>
-      <h2 id="form-title">Login as Developer</h2>
-      <form id="login-form" onsubmit="handleLogin(event)">
-        <input type="text" id="username" placeholder="Username" required />
-        <input type="password" id="password" placeholder="Password" required />
-        <input type="text" id="token" placeholder="Token" style="display:none;" required />
-        <button type="submit" class="btn submit-btn">Login</button>
-      </form>
+  <main class="splash-container">
+    <div class="logo" data-aos="zoom-in">⚡ <span>Zky</span>Panel</div>
+    <div class="tagline" data-aos="fade-up" data-aos-delay="300">
+      Sistem Panel Pterodactyl Profesional
     </div>
-  </div>
-
-  <div class="dashboard" id="developer-dashboard">
-    <div class="sidebar">
-      <div class="dash-logo">⚡ ZkyDev</div>
-      <ul class="menu">
-        <li onclick="showSection('cek-domain')">Cek Domain</li>
-        <li onclick="showSection('ubah-domain')">Ubah Domain</li>
-        <li onclick="showSection('hapus-domain')">Hapus Domain</li>
-        <li onclick="showSection('cek-plta')">Cek PLTA</li>
-        <li onclick="showSection('ubah-plta')">Ubah PLTA</li>
-        <li onclick="showSection('hapus-plta')">Hapus PLTA</li>
-        <li onclick="showSection('cek-pltc')">Cek PLTC</li>
-        <li onclick="showSection('ubah-pltc')">Ubah PLTC</li>
-        <li onclick="showSection('hapus-pltc')">Hapus PLTC</li>
-        <li onclick="showSection('cek-eggid')">Cek EggID</li>
-        <li onclick="showSection('ubah-eggid')">Ubah EggID</li>
-        <li onclick="showSection('cek-nestid')">Cek NestID</li>
-        <li onclick="showSection('ubah-nestid')">Ubah NestID</li>
-        <li onclick="showSection('cek-loc')">Cek LOC</li>
-        <li onclick="showSection('ubah-loc')">Ubah LOC</li>
-        <li onclick="showSection('list-panel')">List Panel</li>
-        <li onclick="showSection('delete-panel')">Delete Panel</li>
-        <li onclick="showSection('create-panel')">Create Panel</li>
-        <li onclick="logout()">Logout</li>
-      </ul>
-    </div>
-    <div class="main-content">
-      <div class="header">Developer Dashboard</div>
-      <div id="dashboard-content">
-        <div class="welcome">Welcome, <strong id="dev-name">ZkyDev</strong>! 🚀</div>
+    <div class="role-options" data-aos="fade-up" data-aos-delay="600">
+      <div class="role-card dev" onclick="goToLogin('dev')">
+        <div class="icon">🔐</div>
+        <h3>Developer</h3>
+        <p>Akses penuh ke semua fitur panel</p>
+      </div>
+      <div class="role-card reseller" onclick="goToLogin('reseller')">
+        <div class="icon">🚀</div>
+        <h3>Reseller</h3>
+        <p>Buat panel instan dengan sekali klik</p>
       </div>
     </div>
-  </div>
-
-  <div class="dashboard" id="reseller-dashboard">
-    <div class="sidebar">
-      <div class="dash-logo">⚡ Zky — Reseller</div>
-      <ul class="menu">
-        <li onclick="showSection('create-panel-reseller')">Create Panel</li>
-        <li onclick="showSection('hapus-data')">Hapus Data</li>
-        <li onclick="logout()">Logout</li>
-      </ul>
-    </div>
-    <div class="main-content">
-      <div class="header">Reseller Dashboard</div>
-      <div id="reseller-content">
-        <div class="welcome">Halo, kamu siap bikin panel? 💻</div>
-      </div>
-    </div>
-  </div>
+  </main>
 
   <script src="script.js"></script>
 </body>
