@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Developer | ZkyPanel</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Orbitron&display=swap" rel="stylesheet"/>
+</head>
+<body class="dashboard-body">
+  <div class="bg-effects"></div>
+  <div class="grid"></div>
 
+  <div class="dashboad">
+    <aside class="sidebar" data-aos="slide-right" data-aos-delay="100">
+      <div class="logo">⚡ ZkyDev</div>
+      <div class="role-badge">Developer</div>
+
+      <nav class="nav-menu">
+        <div class="menu-title">🛠️ Domain</div>
+        <a onclick="loadSection('cek-domain')">Cek Domain</a>
+        <a onclick="loadSection('ubah-domain')">Ubah Domain</a>
+        <a onclick="loadSection('hapus-domain')">Hapus Domain</a>
+
+        <div class="menu-title">🔧 PLTA & PLTC</div>
+        <a onclick="loadSection('cek-plta')">Cek PLTA</a>
+        <a onclick="loadSection('ubah-plta')">Ubah PLTA</a>
+        <a onclick="loadSection('hapus-plta')">Hapus PLTA</a>
+        <a onclick="loadSection('cek-pltc')">Cek PLTC</a>
+        <a onclick="loadSection('ubah-pltc')">Ubah PLTC</a>
+        <a onclick="loadSection('hapus-pltc')">Hapus PLTC</a>
+
+        <div class="menu-title">🧩 Egg & Nest</div>
+        <a onclick="loadSection('cek-eggid')">Cek EggID</a>
+        <a onclick="loadSection('ubah-eggid')">Ubah EggID</a>
+        <a onclick="loadSection('cek-nestid')">Cek NestID</a>
+        <a onclick="loadSection('ubah-nestid')">Ubah NestID</a>
+        <a onclick="loadSection('cek-loc')">Cek Lokasi</a>
+        <a onclick="loadSection('ubah-loc')">Ubah Lokasi</a>
+
+        <div class="menu-title">📋 Panel</div>
+        <a onclick="loadSection('list-panel')">Daftar Panel</a>
+        <a onclick="loadSection('delete-panel')">Hapus Panel</a>
+        <a onclick="loadSection('create-panel')">Buat Panel Baru</a>
+
+        <div class="logout-btn" onclick="logout()">Keluar</div>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="main-content">
+      <div class="welcome" data-aos="fade-up">
+        <h1>Selamat Datang, <span>zkydev</span></h1>
+        <p>Kamu memiliki akses penuh ke sistem panel.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="api.js"></script>
+</body>
+</html>
