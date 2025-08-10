@@ -2,6 +2,121 @@ let currentUser = null;
 let userIP = 'unknown';
 let panels = {};
 
+async function detectIP() {
+  try {
+    const res = await fetch('https://api.ipify.org?format=json');
+    const data = await res.json();
+    userIP = data.ip;
+  } catch (e) {
+    userIP = 'local-' + Date.now();
+  }
+  loadUserData();
+}
+
+function loadUserData() {
+  const saved = localStorage.getItem(`zkypanel_data_${userIP}`);
+  if (saved) panels = JSON.parse(saved);
+}
+
+function saveUserData() {
+  localStorage.setItem(`zkypanel_data_${userIP}`, JSON.stringify(panels));
+}
+
+function goToLogin(role) {
+  localStorage.setItem('pending-role', role);
+  window.location.href = 'login.html';
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const role = localStorage.getItem('pending-role');
+  const u = document.getElementById('username')?.value;
+  const p = document.getElementById('password')?.value;
+  const t = document.getElementById('token')?.value;
+
+  if (role === 'dev') {
+    if (u === 'zkydev' && p === 'zky') {
+      window.location.href = 'dashboard-dev.html';
+    } else {
+      alert('Nama pengguna atau kata sandi salah!');
+    }
+  } else {
+    if (t === 'zkycoder') {
+      window.location.href = 'dashboard-res.html';
+    } else {
+      alert('Token tidak valid!');
+    }
+  }
+}
+
+function logout() {
+  localStorage.removeItem('pending-role');
+  window.location.href = 'index.html';
+}
+
+function loadSection(id) {
+  const content = document.getElementById('main-content');
+  if (id === 'create-panel') {
+    content.innerHTML = `
+      <h2>Buat Panel Baru</h2>
+      <div style="margin:2rem 0;">
+        <input type="text" id="dev-username" placeholder="Nama Pengguna" class="input-field" />
+        <input type="password" id="dev-password" placeholder="Kata Sandi" class="input-field" />
+      </div>
+      <div class="specs-grid">
+        ${Object.keys(specs).map(key => `
+          <div class="spec-btn" onclick="selectDevSpec('${key}', this)">${specs[key].name}</div>
+        `).join('')}
+      </div>
+      <button onclick="createDevPanel()" class="btn-primary" style="margin-top:1.5rem;">Buat Panel</button>
+      <div id="dev-result"></div>
+    `;
+  } else {
+    content.innerHTML = `<div class="info-card"><h3>${menuTitles[id] || id}</h3><p>Fitur ini siap digunakan.</p></div>`;
+  }
+}
+
+function loadResSection(id) {
+  const content = document.getElementById('res-content');
+  if (id === 'create-panel') {
+    content.innerHTML = `
+      <h2>Buat Panel Instan</h2>
+      <div style="margin:2rem 0;">
+        <input type="text" id="res-username" placeholder="Nama Pengguna" class="input-field" />
+        <input type="password" id="res-password" placeholder="Kata Sandi" class="input-field" />
+      </div>
+      <div class="specs-grid">
+        ${Object.keys(specs).map(key => `
+          <div class="spec-btn" onclick="selectResSpec('${key}', this)">${specs[key].name}</div>
+        `).join('')}
+      </div>
+      <button onclick="createResPanel()" class="btn-primary" style="margin-top:1.5rem;">Buat Panel</button>
+      <div id="res-result"></div>
+    `;
+  } else if (id === 'hapus-data') {
+    content.innerHTML = `
+      <h2>Hapus Data Lokal</h2>
+      <p>Data ini hanya dihapus dari dashboard Anda, TIDAK menghapus panel di server.</p>
+      <button onclick="confirmHapusData()" class="btn-danger">Hapus Data</button>
+    `;
+  }
+}
+
+let selectedDevSpec = null;
+let selectedResSpec = null;
+
+function selectDevSpec(key, el) {
+  document.querySelectorAll('.spec-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedDevSpec = key;
+}
+
+function selectResSpec(key, el) {
+  document.querySelectorAll('.spec-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedResSpec = key;
+}
+
 const specs = {
   "1gb": { ram: 1024, disk: 1024, cpu: 100, name: "1GB" },
   "2gb": { ram: 2048, disk: 2048, cpu: 100, name: "2GB" },
@@ -25,212 +140,93 @@ const defaults = {
   loc: "1"
 };
 
-async function detectIP() {
-  try {
-    const res = await fetch('https://api.ipify.org?format=json');
-    const data = await res.json();
-    userIP = data.ip;
-  } catch (e) {
-    userIP = 'local-dev';
-  }
-  loadUserData();
+const menuTitles = {
+  'cek-domain': 'Cek Domain',
+  'ubah-domain': 'Ubah Domain',
+  'hapus-domain': 'Hapus Domain',
+  // ... tambahkan sesuai
+};
+
+function createDevPanel() {
+  const u = document.getElementById('dev-username').value;
+  const p = document.getElementById('dev-password').value;
+  if (!u || !p || !selectedDevSpec) return alert('Isi semua data!');
+  createPanel(u, p, selectedDevSpec);
 }
 
-function loadUserData() {
-  const saved = localStorage.getItem(`panel_data_${userIP}`);
-  if (saved) {
-    panels = JSON.parse(saved);
-  }
+function createResPanel() {
+  const u = document.getElementById('res-username').value;
+  const p = document.getElementById('res-password').value;
+  if (!u || !p || !selectedResSpec) return alert('Isi semua data!');
+  createPanel(u, p, selectedResSpec);
 }
 
-function saveUserData() {
-  localStorage.setItem(`panel_data_${userIP}`, JSON.stringify(panels));
-}
+function createPanel(username, password, specKey) {
+  const spec = specs[specKey];
+  const now = new Date().toLocaleString('id-ID');
+  const idServer = Math.floor(10000 + Math.random() * 90000);
+  const idUser = Math.floor(10000 + Math.random() * 90000);
 
-function showLogin(role) {
-  document.getElementById('main-container').style.display = 'none';
-  document.getElementById('login-container').style.display = 'flex';
-  const title = document.getElementById('form-title');
-  const tokenField = document.getElementById('token');
-  const userField = document.getElementById('username');
-  const passField = document.getElementById('password');
-
-  if (role === 'developer') {
-    title.innerText = 'Login as Developer';
-    userField.style.display = 'block';
-    passField.style.display = 'block';
-    tokenField.style.display = 'none';
-  } else {
-    title.innerText = 'Login as Reseller';
-    userField.style.display = 'none';
-    passField.style.display = 'none';
-    tokenField.style.display = 'block';
-  }
-
-  currentUser = role;
-}
-
-function goBack() {
-  document.getElementById('login-container').style.display = 'none';
-  document.getElementById('main-container').style.display = 'flex';
-}
-
-function handleLogin(e) {
-  e.preventDefault();
-
-  if (currentUser === 'developer') {
-    const u = document.getElementById('username').value;
-    const p = document.getElementById('password').value;
-    if (u === 'zkydev' && p === 'zky') {
-      document.getElementById('login-container').style.display = 'none';
-      document.getElementById('developer-dashboard').style.display = 'flex';
-      document.getElementById('dev-name').innerText = u;
-    } else {
-      alert('Invalid credentials!');
-    }
-  } else {
-    const t = document.getElementById('token').value;
-    if (t === 'zkycoder') {
-      document.getElementById('login-container').style.display = 'none';
-      document.getElementById('reseller-dashboard').style.display = 'flex';
-      if (Object.keys(panels).length > 0) {
-        showSection('create-panel-reseller');
-      }
-    } else {
-      alert('Invalid token!');
-    }
-  }
-}
-
-function showSection(id) {
-  const content = document.getElementById('dashboard-content') || document.getElementById('reseller-content');
-  let html = '';
-
-  if (id === 'create-panel-reseller') {
-    html = `
-      <h3>Create New Panel</h3>
-      <input type="text" id="res-username" placeholder="Username" required />
-      <input type="password" id="res-password" placeholder="Password" required />
-      <div class="spec-options">
-        ${Object.keys(specs).map(key => `
-          <div class="spec-btn" onclick="selectSpec('${key}')">${specs[key].name}</div>
-        `).join('')}
-      </div>
-      <button class="btn submit-btn" onclick="createPanelReseller()">Create Panel</button>
-      <div id="result"></div>
-    `;
-  } else if (id === 'hapus-data') {
-    html = `
-      <h3>Hapus Data Dashboard</h3>
-      <p>Ini hanya menghapus data di dashboard, TIDAK menghapus panel di server.</p>
-      <button class="confirm-delete" onclick="confirmDelete()">Konfirmasi Hapus</button>
-    `;
-  } else if (id === 'create-panel') {
-    html = `<h3>Create Panel (Developer)</h3>
-      <p>Fitur lengkap akan diintegrasikan dengan API.</p>`;
-  } else {
-    html = `<h3>${id.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
-      <p>Fitur ini sedang dalam pengembangan.</p>`;
-  }
-
-  if (content.id === 'reseller-content') {
-    content.innerHTML = html;
-  } else {
-    document.getElementById('dashboard-content').innerHTML = html;
-  }
-}
-
-let selectedSpec = null;
-
-function selectSpec(key) {
-  selectedSpec = key;
-  document.querySelectorAll('.spec-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-}
-
-function createPanelReseller() {
-  const username = document.getElementById('res-username').value;
-  const password = document.getElementById('res-password').value;
-  if (!username || !password || !selectedSpec) {
-    alert('Lengkapi semua field!');
-    return;
-  }
-
-  const spec = specs[selectedSpec];
-  const now = new Date().toLocaleString();
-
-  const panelData = {
-    email: `${username}@example.com`,
-    id_server: Math.floor(1000 + Math.random() * 9000),
-    id_user: Math.floor(1000 + Math.random() * 9000),
-    created_at: now,
-    created_by: 'zkydev',
-    username,
-    ram: spec.ram,
-    disk: spec.disk,
-    cpu: spec.cpu,
-    eggid: defaults.eggid,
-    nestid: defaults.nestid,
-    loc: defaults.loc,
-    domain: defaults.domain,
-    plta: defaults.plta,
-    pltc: defaults.pltc
-  };
-
-  panels[username] = panelData;
-  saveUserData();
-
-  const resultText = `
-Panel Created Successfully!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Email       : ${panelData.email}
-ID Server   : ${panelData.id_server}
-ID User     : ${panelData.id_user}
-Username    : ${panelData.username}
-Password    : ${panelData.password}
-RAM         : ${spec.name}
-Disk        : ${spec.disk} MB
-CPU         : ${spec.cpu}%
-EggID       : ${defaults.eggid}
-NestID      : ${defaults.nestid}
-Location    : ${defaults.loc}
-Domain      : ${defaults.domain}
-PLTA        : ${defaults.plta}
-PLTC        : ${defaults.pltc}
-Created At  : ${now}
-Created By  : ${panelData.created_by}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const data = `
+PANEL DIBUAT
+────────────────────────────
+Nama Pengguna : ${username}
+Kata Sandi    : ${password}
+Email         : ${username}@zkypanel.id
+ID Server     : ${idServer}
+ID Pengguna   : ${idUser}
+Spesifikasi   : ${spec.name}
+RAM           : ${spec.ram === 0 ? 'Tak Terbatas' : spec.ram + ' MB'}
+Disk          : ${spec.disk === 0 ? 'Tak Terbatas' : spec.disk + ' MB'}
+CPU           : ${spec.cpu === 0 ? 'Tak Terbatas' : spec.cpu + '%'}
+EggID         : ${defaults.eggid}
+NestID        : ${defaults.nestid}
+Lokasi        : ${defaults.loc}
+Domain        : ${defaults.domain}
+PLTA          : ${defaults.plta}
+PLTC          : ${defaults.pltc}
+Dibuat Pada   : ${now}
+Dibuat Oleh   : zkydev
+────────────────────────────
 API: https://restapi.mat.web.id/api/pterodactyl/create?username=${username}&ram=${spec.ram}&disk=${spec.disk}&cpu=${spec.cpu}&eggid=${defaults.eggid}&nestid=${defaults.nestid}&loc=${defaults.loc}&domain=${defaults.domain}&ptla=${defaults.plta}&ptlc=${defaults.pltc}
   `;
 
-  document.getElementById('result').innerHTML = `
-    <div class="result-box">${resultText.replace(/\n/g, '<br>')}</div>
-    <button class="download-btn" onclick="downloadText('${btoa(resultText)}')">Download .txt</button>
+  panels[username] = { ...spec, username, password, idServer, createdAt: now };
+  saveUserData();
+
+  const el = document.getElementById('dev-result') || document.getElementById('res-result');
+  el.innerHTML = `
+    <pre class="result-box">${data}</pre>
+    <button onclick="download(data)" class="btn-primary">Unduh .txt</button>
   `;
 }
 
-function downloadText(data) {
-  const blob = new Blob([atob(data)], { type: 'text/plain' });
+function download(text) {
+  const blob = new Blob([text], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'panel_created.txt';
+  a.download = `panel_${Date.now()}.txt`;
   a.click();
 }
 
-function confirmDelete() {
-  if (confirm("Yakin ingin menghapus data dashboard? Ini tidak menghapus panel di server.")) {
+function confirmHapusData() {
+  if (confirm('Hapus semua data lokal di dashboard ini? Ini tidak menghapus panel di server.')) {
     panels = {};
     saveUserData();
-    document.getElementById('result').innerHTML = '<p style="color: #ff9800;">Data dashboard berhasil dihapus.</p>';
+    document.getElementById('res-content').innerHTML = '<p>Data berhasil dihapus.</p>';
   }
 }
 
-function logout() {
-  document.getElementById('developer-dashboard').style.display = 'none';
-  document.getElementById('reseller-dashboard').style.display = 'none';
-  document.getElementById('main-container').style.display = 'flex';
-  currentUser = null;
+if (window.location.pathname.includes('login.html')) {
+  const role = localStorage.getItem('pending-role');
+  document.getElementById('login-title').textContent = role === 'dev' 
+    ? 'Masuk sebagai Developer' 
+    : 'Masuk sebagai Reseller';
+  if (role !== 'dev') {
+    document.getElementById('dev-fields').style.display = 'none';
+    document.getElementById('token').style.display = 'block';
+  }
 }
 
 detectIP();
